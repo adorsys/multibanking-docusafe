@@ -1,11 +1,9 @@
 package de.adorsys.multibanking.service.base;
 
-import org.adorsys.docusafe.business.DocumentSafeService;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.adorsys.multibanking.auth.SystemContext;
 import de.adorsys.multibanking.auth.UserContext;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 
 /**
  * Service that access the system repository use this service.
@@ -16,8 +14,8 @@ import de.adorsys.multibanking.auth.UserContext;
 public class SystemObjectService extends CacheBasedService {
 	private SystemContext systemContext;
 
-	public SystemObjectService(ObjectMapper objectMapper, SystemContext systemContext, DocumentSafeService documentSafeService) {
-	    super(objectMapper, documentSafeService);
+	public SystemObjectService(ObjectMapper objectMapper, SystemContext systemContext, CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService) {
+	    super(objectMapper, cachedTransactionalDocumentSafeService);
 		this.systemContext = systemContext;
 	}
 

@@ -1,21 +1,6 @@
 package de.adorsys.mbs.authserver.example.config;
 
-import javax.annotation.PostConstruct;
-
-import org.adorsys.docusafe.business.DocumentSafeService;
-import org.adorsys.docusafe.business.impl.DocumentSafeServiceImpl;
-import org.adorsys.docusafe.business.types.UserID;
-import org.adorsys.docusafe.business.types.complex.UserIDAuth;
-import org.adorsys.encobject.domain.ReadKeyPassword;
-import org.adorsys.encobject.filesystem.FileSystemExtendedStorageConnection;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.adorsys.lockpersistence.client.LockClient;
 import de.adorsys.lockpersistence.client.NoopLockClient;
 import de.adorsys.sts.keymanagement.persistence.KeyStoreRepository;
@@ -27,10 +12,24 @@ import de.adorsys.sts.persistence.KeyEntryMapper;
 import de.adorsys.sts.resourceserver.persistence.ResourceServerRepository;
 import de.adorsys.sts.resourceserver.service.UserDataRepository;
 import de.adorsys.sts.token.passwordgrant.EnablePasswordGrant;
+import org.adorsys.docusafe.business.types.UserID;
+import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
+import org.adorsys.docusafe.spring.annotation.UseDocusafeSpringConfiguration;
+import org.adorsys.docusafe.spring.factory.SpringCachedTransactionalDocusafeServiceFactory;
+import org.adorsys.encobject.domain.ReadKeyPassword;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 @EnablePasswordGrant
 @EnableConfigurationProperties
+@UseDocusafeSpringConfiguration
 public class AuthServerConfig {
 
     @Value("${docusafe.system.user.name}")
@@ -46,29 +45,28 @@ public class AuthServerConfig {
     }
 
 	@Bean
-	DocumentSafeService documentSafeService() {
-		FileSystemExtendedStorageConnection storageConnection = new FileSystemExtendedStorageConnection("target/authServer/"+RandomStringUtils.randomAlphanumeric(10).toUpperCase());
-		DocumentSafeServiceImpl documentSafeService= new DocumentSafeServiceImpl(storageConnection);
+	public CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService(SpringCachedTransactionalDocusafeServiceFactory factory) {
+		CachedTransactionalDocumentSafeService service = factory.getCachedTransactionalDocumentSafeServiceWithSubdir(RandomStringUtils.randomAlphanumeric(10).toUpperCase());
 		// Create system user.
-		if(!documentSafeService.userExists(systemId.getUserID())){
-			documentSafeService.createUser(systemId);
+		if(!service.userExists(systemId.getUserID())){
+			service.createUser(systemId);
 		}
-		return documentSafeService;
+		return service;
 	}
     
 	@Bean
-	ResourceServerRepository resourceServerRepository(ObjectMapper objectMapper, DocumentSafeService documentSafeService) {
-		return new FsResourceServerRepository(systemId, documentSafeService, objectMapper);
+	ResourceServerRepository resourceServerRepository(ObjectMapper objectMapper, CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService) {
+		return new FsResourceServerRepository(systemId, cachedTransactionalDocumentSafeService, objectMapper);
 	}
 
 	@Bean
-	UserDataRepository userDataRepository(ObjectMapper objectMapper, DocumentSafeService documentSafeService) {
-		return new FsUserDataRepository(documentSafeService, objectMapper);
+	UserDataRepository userDataRepository(ObjectMapper objectMapper, CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService) {
+		return new FsUserDataRepository(cachedTransactionalDocumentSafeService, objectMapper);
 	}
 
 	@Bean
-	KeyStoreRepository keyStoreRepository(ObjectMapper objectMapper, DocumentSafeService documentSafeService, KeyManagementProperties keyManagementProperties) {
-		return new FsKeyStoreRepository(systemId, documentSafeService, keyManagementProperties, new KeyEntryMapper(objectMapper));
+	KeyStoreRepository keyStoreRepository(ObjectMapper objectMapper, CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService, KeyManagementProperties keyManagementProperties) {
+		return new FsKeyStoreRepository(systemId, cachedTransactionalDocumentSafeService, keyManagementProperties, new KeyEntryMapper(objectMapper));
 	}
 	
 	private LockClient lockClient = new NoopLockClient();

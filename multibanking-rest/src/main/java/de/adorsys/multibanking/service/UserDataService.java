@@ -1,20 +1,7 @@
 package de.adorsys.multibanking.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Optional;
-
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import domain.BankAccess;
-import org.adorsys.cryptoutils.exceptions.BaseException;
-import org.adorsys.docusafe.business.DocumentSafeService;
-import org.adorsys.docusafe.business.types.complex.DSDocument;
-import org.adorsys.docusafe.business.types.complex.UserIDAuth;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
+import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.exception.UserNotFoundException;
@@ -22,10 +9,19 @@ import de.adorsys.multibanking.service.base.StorageUserService;
 import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
-import de.adorsys.multibanking.utils.Ids;
 import domain.BankApi;
 import domain.BankApiUser;
+import org.adorsys.cryptoutils.exceptions.BaseException;
+import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import spi.OnlineBankingService;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
 
 /**
  * Manage Access to the user data. Manages all state information for this user account.
@@ -44,7 +40,7 @@ public class UserDataService {
     @Autowired
     private StorageUserService storageUserService;
     @Autowired
-    private DocumentSafeService documentSafeService;
+    private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 
 	public UserData load(){
 		return uos.load(FQNUtils.userDataFQN(), valueType())
@@ -60,7 +56,7 @@ public class UserDataService {
 	}
 	
     public DSDocument loadDocument() {
-        return documentSafeService.readDocument(uos.auth(), FQNUtils.userDataFQN());
+        return cachedTransactionalDocumentSafeService.nonTxReadDocument(uos.auth(), FQNUtils.userDataFQN());
     }
 	
 	

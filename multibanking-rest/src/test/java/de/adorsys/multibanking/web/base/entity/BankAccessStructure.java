@@ -7,11 +7,13 @@ public class BankAccessStructure {
     private final String bankCode;
     private final String bankLogin;
     private final String pin;
+    private final String id;
 
     public BankAccessStructure(String bankCode, String bankLogin, String pin) {
         this.bankCode = bankCode;
         this.bankLogin = bankLogin;
         this.pin = pin;
+        this.id = null;
     }
 
     public String getBankCode() {
@@ -24,5 +26,9 @@ public class BankAccessStructure {
 
     public String getPin() {
         return pin;
+    }
+
+    public String getId() {
+        return id;
     }
 }

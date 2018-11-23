@@ -1,10 +1,5 @@
 package de.adorsys.mbs.authserver.example;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.Security;
-
-import org.adorsys.cryptoutils.storeconnectionfactory.ExtendedStoreConnectionFactory;
 import org.adorsys.cryptoutils.utils.ShowProperties;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.slf4j.LoggerFactory;
@@ -14,12 +9,15 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.Security;
+
 
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class})
 @ComponentScan
 public class AuthServerApplication {
-    public static void main(String[] origargs) throws UnknownHostException {
-        String[] args = ExtendedStoreConnectionFactory.readArguments(origargs);
+    public static void main(String[] args) throws UnknownHostException {
 		Security.addProvider(new BouncyCastleProvider());
 		SpringApplication app = new SpringApplication(AuthServerApplication.class);
         Environment env = app.run(args).getEnvironment();

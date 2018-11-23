@@ -1,10 +1,10 @@
 package de.adorsys.multibanking.service.base;
 
-import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentDirectoryFQN;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,10 @@ public abstract class DocumentBasedService {
     private final static Logger LOGGER = LoggerFactory.getLogger(DocumentBasedService.class);
 
     protected abstract UserIDAuth auth();
-    protected abstract DocumentSafeService docs();
+    protected abstract CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService();
 
 	public boolean documentExists(DocumentFQN documentFQN){
-		return docs().documentExists(auth(), documentFQN);
+		return cachedTransactionalDocumentSafeService().nonTxDocumentExists(auth(), documentFQN);
 	}
 
 	/**
@@ -32,11 +32,11 @@ public abstract class DocumentBasedService {
 	 */
 	public DSDocument loadDocument(DocumentFQN documentFQN) {
         LOGGER.debug("loadDocument " + documentFQN);
-		return docs().readDocument(auth(), documentFQN);
+		return cachedTransactionalDocumentSafeService().nonTxReadDocument(auth(), documentFQN);
 	}
 
 	public void storeDocument(DSDocument dsDocument) {
-		docs().storeDocument(auth(), dsDocument);
+		cachedTransactionalDocumentSafeService().nonTxStoreDocument(auth(), dsDocument);
 	}
 
 	/**
@@ -49,7 +49,7 @@ public abstract class DocumentBasedService {
         LOGGER.debug("storeDocument " + documentFQN);
 		DocumentContent documentContent = new DocumentContent(data);
 		DSDocument dsDocument = new DSDocument(documentFQN, documentContent, null);
-		docs().storeDocument(auth(), dsDocument);
+		cachedTransactionalDocumentSafeService().nonTxStoreDocument(auth(), dsDocument);
 	}
 
 	/**
@@ -58,11 +58,11 @@ public abstract class DocumentBasedService {
 	 * @param dirFQN
 	 */
 	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
-		docs().deleteFolder(auth(), dirFQN);
+		cachedTransactionalDocumentSafeService().nonTxDeleteFolder(auth(), dirFQN);
 	}
 
 	public void deleteDocument(DocumentFQN documentFQN) {
         LOGGER.debug("deleteDocument " + documentFQN);
-        docs().deleteDocument(auth(), documentFQN);
+        cachedTransactionalDocumentSafeService().nonTxDeleteDocument(auth(), documentFQN);
 	}
 }

@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.adorsys.multibanking.config.service.BaseServiceTest;
@@ -27,6 +28,7 @@ import de.adorsys.onlinebanking.mock.MockBanking;
 import figo.FigoBanking;
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("docusafe")
 public class BankAccessServiceFakeUserTest extends BaseServiceTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(BankAccessServiceFakeUserTest.class);
 
@@ -51,23 +53,29 @@ public class BankAccessServiceFakeUserTest extends BaseServiceTest {
 
     @Before
     public void beforeTest() throws IOException {
+        LOGGER.info("BEFORE TEST START");
     	MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(mockBanking);
+        LOGGER.info("BEFORE TEST END");
     }
 
     @After
     public void after(){
-    	if(userContext!=null)
+        LOGGER.info("AFTER TEST START");
+        if(userContext!=null)
     		LOGGER.debug(userContext.getRequestCounter().toString());
+        LOGGER.info("AFTER TEST END");
     }
 
     @Test
     public void when_delete_bankAccesd_user_notExist_should_throw_exception() {
+        LOGGER.info("TEST START");
     	// Inject a user, without creating that user in the storage.
     	auth("fakeUser", "fakePassword");
 
         // TODO Exception doesnt rise.
          thrown.expect(UserNotFoundException.class);
         bankAccessService.deleteBankAccess("badAccess");
+        LOGGER.info("TEST END");
     }
 }

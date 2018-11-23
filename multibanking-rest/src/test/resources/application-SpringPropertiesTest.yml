@@ -42,3 +42,10 @@ sts:
           size: 256
           validityInterval: 60000
           legacyInterval: 120000
+
+docusafe:
+  storeconnection:
+    filesystem:
+      rootbucket: target/multibanking-filesystem
+      encryptionpassword: null
+

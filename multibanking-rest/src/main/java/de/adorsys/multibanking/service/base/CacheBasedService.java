@@ -1,28 +1,25 @@
 package de.adorsys.multibanking.service.base;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.adorsys.multibanking.auth.CacheEntry;
+import de.adorsys.multibanking.auth.UserContext;
+import de.adorsys.multibanking.auth.UserContextCache;
 import org.adorsys.cryptoutils.exceptions.BaseException;
-import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentDirectoryFQN;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import de.adorsys.multibanking.auth.CacheEntry;
-import de.adorsys.multibanking.auth.UserContext;
-import de.adorsys.multibanking.auth.UserContextCache;
-import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Base class for providing access to object thru cache.
@@ -36,7 +33,7 @@ public abstract class CacheBasedService implements CacheBasedInterface {
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheBasedService.class);
 
 	private ObjectMapper objectMapper;
-	private DocumentSafeService documentSafeService;
+	private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 	protected abstract UserContext user();
 
 	public UserContextCache userContextCache() {
@@ -47,9 +44,9 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 		user().setCacheEnabled(true);
 	}
 
-	protected CacheBasedService(ObjectMapper objectMapper, DocumentSafeService documentSafeService) {
+	protected CacheBasedService(ObjectMapper objectMapper, CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService) {
 		this.objectMapper = objectMapper;
-		this.documentSafeService = documentSafeService;
+		this.cachedTransactionalDocumentSafeService = cachedTransactionalDocumentSafeService;
 	}
 
 	public UserIDAuth auth() {
@@ -79,14 +76,14 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 		}
 
 		// Return empty if base document does not exist.
-		if (!documentSafeService.documentExists(user().getAuth(), documentFQN)){
+		if (!cachedTransactionalDocumentSafeService.nonTxDocumentExists(user().getAuth(), documentFQN)){
 	        LOGGER.debug("load, doc not found: " + documentFQN);
 			return Optional.empty();
 		}
 
 		try {
 	        LOGGER.debug("loading from file: " + documentFQN);
-			Optional<T> ot = Optional.of(objectMapper.readValue(documentSafeService.readDocument(user().getAuth(), documentFQN).getDocumentContent().getValue(), valueType));
+			Optional<T> ot = Optional.of(objectMapper.readValue(cachedTransactionalDocumentSafeService.nonTxReadDocument(user().getAuth(), documentFQN).getDocumentContent().getValue(), valueType));
 
 			// Cache document.
 			userContextCache().cacheHit(documentFQN, valueType, ot, false);
@@ -127,7 +124,7 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 	@Override
 	public <T> boolean documentExists(DocumentFQN documentFQN, TypeReference<T> valueType) {
 		if (userContextCache().isCached(documentFQN, valueType))return true;
-		return documentSafeService.documentExists(auth(), documentFQN);
+		return cachedTransactionalDocumentSafeService.nonTxDocumentExists(auth(), documentFQN);
 	}
 
 	@Override
@@ -138,13 +135,13 @@ public abstract class CacheBasedService implements CacheBasedInterface {
         Optional<CacheEntry<T>> removed = userContextCache().remove(documentFQN, valueType);
         boolean docExist=false;
         try {
-            docExist = documentSafeService.documentExists(auth(), documentFQN);
+            docExist = cachedTransactionalDocumentSafeService.nonTxDocumentExists(auth(), documentFQN);
         } catch (BaseException b){
             LOGGER.warn("error checking existence of Document " + documentFQN);
             // No Action. might nit have been flushed yet.
         }
         if(docExist){
-            documentSafeService.deleteDocument(auth(), documentFQN);
+            cachedTransactionalDocumentSafeService.nonTxDeleteDocument(auth(), documentFQN);
             return true;
         }
         return removed!=null;
@@ -154,7 +151,7 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
 		// First remove all cached object from this dir.
 		clearCached(dirFQN);
-		documentSafeService.deleteFolder(auth(), dirFQN);
+		cachedTransactionalDocumentSafeService.nonTxDeleteFolder(auth(), dirFQN);
 	}
 
 	@Override
@@ -174,7 +171,7 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 						flush(cacheEntry.getDocFqn(), cacheEntry.getEntry().get());
 					} else {
 						LOGGER.debug("Cache entry pre flush : absent. File will be deleted: " + cacheEntry.getDocFqn());
-						documentSafeService.deleteDocument(auth(), cacheEntry.getDocFqn());
+						cachedTransactionalDocumentSafeService.nonTxDeleteDocument(auth(), cacheEntry.getDocFqn());
 					}
 				} else {
 					LOGGER.debug("Cache entry pre flush : clean. No file write : " + cacheEntry.getDocFqn());
@@ -187,7 +184,7 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 	/**
 	 * Remove all Objects whose path start with the corresponding path.
 	 *
-	 * @param accessId
+	 * @param dir
 	 */
 	private void clearCached(DocumentDirectoryFQN dir) {
 		LOGGER.debug("clearing Cached " + dir);
@@ -206,7 +203,7 @@ public abstract class CacheBasedService implements CacheBasedInterface {
 			throw new BaseException(e);
 		}
 		DSDocument dsDocument = new DSDocument(documentFQN, documentContent, null);
-		documentSafeService.storeDocument(auth(), dsDocument);
+		cachedTransactionalDocumentSafeService.nonTxStoreDocument(auth(), dsDocument);
 	}
 
 

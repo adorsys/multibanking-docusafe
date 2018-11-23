@@ -86,6 +86,11 @@
 
         </dependency>
 
+        <dependency>
+            <groupId>de.adorsys.cryptoutils</groupId>
+            <artifactId>encobject</artifactId>
+            <version>${crypt.version}</version>
+        </dependency>
         <!-- Docusafe Connection -->
         <dependency>
             <groupId>de.adorsys.cryptoutils</groupId>
@@ -98,8 +103,26 @@
         <!-- Persistence -->
         <dependency>
             <groupId>de.adorsys</groupId>
-            <artifactId>docusafe-business</artifactId>
+            <artifactId>docusafe-spring</artifactId>
             <version>${docusafe.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.adorsys.cryptoutils</groupId>
+                    <artifactId>encobject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.adorsys.cryptoutils</groupId>
+                    <artifactId>basetypes</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.adorsys.cryptoutils</groupId>
+                    <artifactId>jkeyutils</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- monitoring -->

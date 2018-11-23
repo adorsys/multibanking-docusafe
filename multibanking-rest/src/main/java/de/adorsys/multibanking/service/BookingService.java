@@ -1,7 +1,16 @@
 package de.adorsys.multibanking.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.AccountSynchPref;
+import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
+import de.adorsys.multibanking.domain.BankAccessData;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.BookingEntity;
+import de.adorsys.multibanking.domain.BookingFile;
+import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.UnexistentBookingFileException;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
@@ -14,14 +23,18 @@ import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
 import de.adorsys.multibanking.utils.Ids;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
-import domain.*;
+import domain.BankAccount;
+import domain.BankApi;
+import domain.BankApiUser;
+import domain.Booking;
+import domain.StandingOrder;
 import domain.request.LoadAccountInformationRequest;
 import domain.request.LoadBookingsRequest;
 import domain.response.LoadBookingsResponse;
 import exception.InvalidPinException;
-import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +45,16 @@ import utils.Utils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -65,7 +86,7 @@ public class BookingService {
     @Autowired
     private AnonymizationService anonymizationService;
     @Autowired
-    private DocumentSafeService documentSafeService;
+    private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 
     private static TypeReference<List<BookingEntity>> listType() {
         return new TypeReference<List<BookingEntity>>() {
@@ -86,7 +107,7 @@ public class BookingService {
         DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId, accountId, period);
         if (!bankAccountData.containsBookingFileOfPeriod(period))
             throw new UnexistentBookingFileException(bookingFQN.getValue());
-        return documentSafeService.readDocument(uos.auth(), bookingFQN);
+        return cachedTransactionalDocumentSafeService.nonTxReadDocument(uos.auth(), bookingFQN);
     }
 
     public List<BookingEntity> getAllBookingsAlList(String accessId, String accountId) {

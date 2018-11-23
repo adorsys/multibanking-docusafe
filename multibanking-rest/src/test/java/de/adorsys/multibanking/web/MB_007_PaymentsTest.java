@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.time.LocalDate;
 /**
  * Created by peter on 22.05.18 at 08:04.
  */
+@ActiveProfiles("docusafe")
 public class MB_007_PaymentsTest extends MB_BaseTest {
     private final static String PAYMENT_URI = "/api/v1/bankaccesses/{accessId}/accounts/{accountId}/payments";
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_007_PaymentsTest.class);

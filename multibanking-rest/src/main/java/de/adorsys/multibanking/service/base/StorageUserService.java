@@ -1,8 +1,8 @@
 package de.adorsys.multibanking.service.base;
 
-import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class StorageUserService {
 	private final static Logger LOGGER = LoggerFactory.getLogger(StorageUserService.class);
 
 	@Autowired
-	private DocumentSafeService documentSafeService;
+	private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 
 	/**
 	 * Check existence of the user with the given user id.
@@ -29,7 +29,7 @@ public class StorageUserService {
 	 * @return
 	 */
 	public boolean userExists(UserID userID) {
-		return documentSafeService.userExists(userID);
+		return cachedTransactionalDocumentSafeService.userExists(userID);
 	}
 		
 	/**
@@ -39,7 +39,7 @@ public class StorageUserService {
 	 * @param userIDAuth
 	 */
 	public void createUser(UserIDAuth userIDAuth){
-		documentSafeService.createUser(userIDAuth);
+		cachedTransactionalDocumentSafeService.createUser(userIDAuth);
 	}
 	
 	/**
@@ -48,7 +48,7 @@ public class StorageUserService {
 	 * @param userIDAuth
 	 */
 	public void deleteUser(UserIDAuth userIDAuth) {
-		documentSafeService.destroyUser(userIDAuth);
+		cachedTransactionalDocumentSafeService.destroyUser(userIDAuth);
 	}
 	
 	/**
@@ -58,6 +58,6 @@ public class StorageUserService {
 	 * @return
 	 */
 	public JWK findPublicEncryptionKey(UserID userID){
-		return documentSafeService.findPublicEncryptionKey(userID);
+		return cachedTransactionalDocumentSafeService.findPublicEncryptionKey(userID).getValue();
 	}	
 }

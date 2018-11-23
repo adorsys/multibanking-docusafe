@@ -14,6 +14,7 @@ import java.util.UUID;
 @Data
 public class BankAccessEntity extends BankAccess implements IdentityIf {
 
+    @ApiModelProperty(value = "Unique identifier of this bank access", example = "3c149076-13c4-4190-ace3-e30bf8f61526")
     private String id;
     @ApiModelProperty(value = "Unique identifier of the user owner of this bank access", example = "3c149076-13c4-4190-ace3-e30bf8f61526")
     private String userId;

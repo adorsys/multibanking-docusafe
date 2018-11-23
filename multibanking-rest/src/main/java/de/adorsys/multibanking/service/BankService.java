@@ -1,24 +1,22 @@
 package de.adorsys.multibanking.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.service.base.ListUtils;
+import de.adorsys.multibanking.service.base.SystemObjectService;
+import de.adorsys.multibanking.utils.FQNUtils;
+import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
-import org.adorsys.docusafe.business.DocumentSafeService;
-import org.adorsys.docusafe.business.types.complex.DSDocument;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
-import de.adorsys.multibanking.domain.BankEntity;
-import de.adorsys.multibanking.service.base.ListUtils;
-import de.adorsys.multibanking.service.base.SystemObjectService;
-import de.adorsys.multibanking.utils.FQNUtils;
 
 @Service
 public class BankService {
@@ -26,7 +24,7 @@ public class BankService {
 	@Autowired
 	private SystemObjectService sos;
 	@Autowired
-	private DocumentSafeService documentSafeService;
+	private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 	
 	private final YAMLFactory ymlFactory = new YAMLFactory();
 	private final ObjectMapper ymlObjectMapper = new ObjectMapper(ymlFactory);
@@ -41,7 +39,7 @@ public class BankService {
 	}
 
 	public DSDocument loadDocument() {
-		return documentSafeService.readDocument(sos.auth(), FQNUtils.banksFQN());
+		return cachedTransactionalDocumentSafeService.nonTxReadDocument(sos.auth(), FQNUtils.banksFQN());
 	}
 	
     public void importBanks(InputStream inputStream) throws IOException {

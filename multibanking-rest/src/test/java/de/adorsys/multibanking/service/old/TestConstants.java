@@ -1,17 +1,15 @@
 package de.adorsys.multibanking.service.old;
 
-import java.lang.reflect.Field;
-import java.security.Security;
-
+import de.adorsys.multibanking.auth.SystemContext;
+import de.adorsys.multibanking.auth.UserContext;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.adorsys.encobject.domain.ReadKeyPassword;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-
-import de.adorsys.multibanking.auth.SystemContext;
-import de.adorsys.multibanking.auth.UserContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.Security;
 
 public class TestConstants {
     private final static Logger LOGGER = LoggerFactory.getLogger(TestConstants.class);

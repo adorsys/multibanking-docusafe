@@ -6,9 +6,9 @@ import java.util.Collections;
 import javax.servlet.http.HttpServletRequest;
 
 import de.adorsys.multibanking.auth.BearerTokenFactory;
-import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.adorsys.encobject.domain.ReadKeyPassword;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -60,7 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private StorageUserService storageUserService;
     @Autowired
-    private DocumentSafeService documentSafeService;
+    private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
     
     @Autowired
 	private ObjectMapper objectMapper;
@@ -134,12 +134,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     UserObjectService userObjectService(UserContext userContext){
-    	return new UserObjectService(objectMapper, userContext, documentSafeService);
+    	return new UserObjectService(objectMapper, userContext, cachedTransactionalDocumentSafeService);
     }
 
     @Bean
     SystemObjectService systemObjectService(SystemContext systemContext){
-    	return new SystemObjectService(objectMapper, systemContext,documentSafeService);
+    	return new SystemObjectService(objectMapper, systemContext, cachedTransactionalDocumentSafeService);
     }
 
     @Bean

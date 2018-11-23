@@ -1,13 +1,12 @@
 package de.adorsys.multibanking.service.analytics;
 
-import org.adorsys.docusafe.business.DocumentSafeService;
+import de.adorsys.multibanking.service.base.UserObjectService;
+import de.adorsys.multibanking.utils.FQNUtils;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import de.adorsys.multibanking.service.base.UserObjectService;
-import de.adorsys.multibanking.utils.FQNUtils;
 
 /**
  * Images are stored accessible to everybody using the system id auth.
@@ -20,7 +19,7 @@ public class CustomImageService {
 	@Autowired
 	private UserObjectService uos;
     @Autowired
-    private DocumentSafeService documentSafeService;
+    private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 	
 	/**
 	 * Check if the user has his own copy of this image.
@@ -39,7 +38,7 @@ public class CustomImageService {
 	 * @return
 	 */
 	public DSDocument loadUserImage(String imageName){
-        return documentSafeService.readDocument(uos.auth(), FQNUtils.imageFQN(imageName));
+        return cachedTransactionalDocumentSafeService.nonTxReadDocument(uos.auth(), FQNUtils.imageFQN(imageName));
 	}
 	
 	/**
@@ -51,6 +50,6 @@ public class CustomImageService {
 	public void storeUserImage(String imageName, byte[] data){
         DocumentContent documentContent = new DocumentContent(data);
         DSDocument dsDocument = new DSDocument(FQNUtils.imageFQN(imageName), documentContent, null);
-        documentSafeService.storeDocument(uos.auth(), dsDocument);
+        cachedTransactionalDocumentSafeService.nonTxStoreDocument(uos.auth(), dsDocument);
 	}
 }

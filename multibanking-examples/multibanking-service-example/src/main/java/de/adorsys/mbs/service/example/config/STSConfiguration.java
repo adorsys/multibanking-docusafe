@@ -1,12 +1,6 @@
 package de.adorsys.mbs.service.example.config;
 
-import org.adorsys.docusafe.business.DocumentSafeService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.adorsys.lockpersistence.client.LockClient;
 import de.adorsys.lockpersistence.client.NoopLockClient;
 import de.adorsys.multibanking.auth.SystemContext;
@@ -18,6 +12,10 @@ import de.adorsys.sts.persistence.FsKeyStoreRepository;
 import de.adorsys.sts.persistence.KeyEntryMapper;
 import de.adorsys.sts.pop.EnablePOP;
 import de.adorsys.sts.token.authentication.EnableTokenAuthentication;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableTokenAuthentication
@@ -32,9 +30,9 @@ public class STSConfiguration {
 	String docusafeSystemUserPassword;
 
 	@Bean
-	KeyStoreRepository keyStoreRepository(ObjectMapper objectMapper, DocumentSafeService documentSafeService,
+	KeyStoreRepository keyStoreRepository(ObjectMapper objectMapper, CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService,
 			KeyManagementProperties keyManagementProperties, SystemContext systemContext) {
-		return new FsKeyStoreRepository(systemContext.getUser().getAuth(), documentSafeService, keyManagementProperties,
+		return new FsKeyStoreRepository(systemContext.getUser().getAuth(), cachedTransactionalDocumentSafeService, keyManagementProperties,
 				new KeyEntryMapper(objectMapper));
 	}
 

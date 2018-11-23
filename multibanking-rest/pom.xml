@@ -55,12 +55,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Docusafe Connection -->
-        <dependency>
-            <groupId>de.adorsys.cryptoutils</groupId>
-            <artifactId>storeconnectionfactory</artifactId>
-            <version>${crypt.version}</version>
-        </dependency>
 
         <!-- banking -->
         <dependency>
@@ -102,12 +96,50 @@
             <artifactId>smartanalytics-api</artifactId>
         </dependency>
 
+        <!-- Docusafe Connection -->
+        <dependency>
+            <groupId>de.adorsys</groupId>
+            <artifactId>docusafe-spring</artifactId>
+<!--
+            <version>${docusafe.version}</version>
+-->
+            <scope>provided</scope>
+<!--
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.adorsys.cryptoutils</groupId>
+                    <artifactId>encobject</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.adorsys.cryptoutils</groupId>
+                    <artifactId>basetypes</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>de.adorsys.cryptoutils</groupId>
+                    <artifactId>jkeyutils</artifactId>
+                </exclusion>
+            </exclusions>
+            -->
+        </dependency>
+
         <!-- Persistence -->
+        <!--
         <dependency>
             <groupId>de.adorsys</groupId>
             <artifactId>docusafe-business</artifactId>
             <version>${docusafe.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>de.adorsys</groupId>
+            <artifactId>docusafe-cached-transactional</artifactId>
+            <version>${docusafe.version}</version>
+        </dependency>
+        -->
 
         <!-- Lombok -->
         <dependency>
@@ -199,6 +231,13 @@
             <artifactId>onlinebanking-xls-loader</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>de.adorsys</groupId>
+            <artifactId>docusafe-spring</artifactId>
+            <version>${docusafe.version}</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

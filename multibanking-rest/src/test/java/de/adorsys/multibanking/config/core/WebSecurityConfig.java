@@ -1,14 +1,23 @@
 package de.adorsys.multibanking.config.core;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.auth.BearerTokenFactory;
-import org.adorsys.docusafe.business.DocumentSafeService;
+import de.adorsys.multibanking.auth.SystemContext;
+import de.adorsys.multibanking.auth.UserContext;
+import de.adorsys.multibanking.service.base.StorageUserService;
+import de.adorsys.multibanking.service.base.SystemObjectService;
+import de.adorsys.multibanking.service.base.UserObjectService;
+import de.adorsys.multibanking.service.crypto.SecretClaimDecryptionService;
+import de.adorsys.multibanking.web.analytics.ImageController;
+import de.adorsys.multibanking.web.banks.BankController;
+import de.adorsys.multibanking.web.common.BaseController;
+import de.adorsys.sts.filter.JWTAuthenticationFilter;
+import de.adorsys.sts.token.authentication.TokenAuthenticationService;
+import de.adorsys.sts.tokenauth.BearerToken;
+import de.adorsys.sts.tokenauth.BearerTokenValidator;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.cached.transactional.CachedTransactionalDocumentSafeService;
 import org.adorsys.encobject.domain.ReadKeyPassword;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -32,21 +41,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import de.adorsys.multibanking.auth.SystemContext;
-import de.adorsys.multibanking.auth.UserContext;
-import de.adorsys.multibanking.service.base.StorageUserService;
-import de.adorsys.multibanking.service.base.SystemObjectService;
-import de.adorsys.multibanking.service.base.UserObjectService;
-import de.adorsys.multibanking.service.crypto.SecretClaimDecryptionService;
-import de.adorsys.multibanking.web.analytics.ImageController;
-import de.adorsys.multibanking.web.banks.BankController;
-import de.adorsys.multibanking.web.common.BaseController;
-import de.adorsys.sts.filter.JWTAuthenticationFilter;
-import de.adorsys.sts.token.authentication.TokenAuthenticationService;
-import de.adorsys.sts.tokenauth.BearerToken;
-import de.adorsys.sts.tokenauth.BearerTokenValidator;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -67,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	private ObjectMapper objectMapper;
     
     @Autowired
-    private DocumentSafeService documentSafeService;
+    private CachedTransactionalDocumentSafeService cachedTransactionalDocumentSafeService;
 
 
     @Override
@@ -134,12 +131,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Bean
     UserObjectService userObjectService(UserContext userContext){
-    	return new UserObjectService(objectMapper, userContext, documentSafeService);
+    	return new UserObjectService(objectMapper, userContext, cachedTransactionalDocumentSafeService);
     }
 
     @Bean
     SystemObjectService systemObjectService(SystemContext systemContext){
-    	return new SystemObjectService(objectMapper, systemContext, documentSafeService);
+    	return new SystemObjectService(objectMapper, systemContext, cachedTransactionalDocumentSafeService);
     }
 
     @Bean
