@@ -19,6 +19,7 @@
         </encoder>
     </appender>
 
+    <logger name="org.adorsys.docusafe.business.impl" level="debug"/>
     <logger name="de.adorsys.multibanking.web.base" level="debug"/>
     <logger name="org.adorsys" level="info"/>
     <logger name="de.adorsys" level="info"/>
