@@ -1,4 +1,4 @@
-# Multibanking
+# multibanking-docusafe
 
 ## Introduction
 The multibanking project provides authenticated access to a users bank account. 
@@ -7,7 +7,7 @@ With validated online-banking credentials, the user can authorize an application
 
 ## Building
  ```
- git clone https://github.com/adorsys/multibanking.git
+ git clone https://github.com/adorsys/multibanking-docusafe.git
  mvn clean install
   ```
 
