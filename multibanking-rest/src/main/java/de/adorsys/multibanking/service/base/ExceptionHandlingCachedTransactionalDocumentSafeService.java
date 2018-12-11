@@ -208,11 +208,20 @@ public class ExceptionHandlingCachedTransactionalDocumentSafeService implements 
     @Override
     public void txDeleteFolder(UserIDAuth userIDAuth, DocumentDirectoryFQN documentDirectoryFQN) {
         try {
-        } catch (BaseException b) {
             delegate.txDeleteFolder(userIDAuth, documentDirectoryFQN);
+        } catch (BaseException b) {
             throw checkContainer(b, userIDAuth);
         }
 
+    }
+
+    @Override
+    public void transferFromNonTxToTx(UserIDAuth userIDAuth, DocumentFQN documentFQN, DocumentFQN documentFQN1) {
+        try {
+            delegate.transferFromNonTxToTx(userIDAuth, documentFQN, documentFQN1);
+        } catch (BaseException b) {
+            throw checkContainer(b, userIDAuth);
+        }
     }
 
     @Override
