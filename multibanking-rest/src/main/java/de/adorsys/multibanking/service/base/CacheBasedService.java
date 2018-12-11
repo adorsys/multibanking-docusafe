@@ -29,7 +29,7 @@ import java.util.Optional;
  * @author fpo 2018-04-06 04:36
  *
  */
-public abstract class CacheBasedService implements g {
+public abstract class CacheBasedService implements CacheBasedInterface {
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheBasedService.class);
 
 	private ObjectMapper objectMapper;
