@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking-docusafe</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>1.2.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>multibanking-rest</artifactId>
@@ -60,17 +60,17 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-figo</artifactId>
-            <version>${project.version}</version>
+            <version>${multibanking.version}</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-finapi</artifactId>
-            <version>${project.version}</version>
+            <version>${multibanking.version}</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-hbci4java</artifactId>
-            <version>${project.version}</version>
+            <version>${multibanking.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>ch.qos.logback</groupId>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-mock</artifactId>
-            <version>${project.version}</version>
+            <version>${multibanking.version}</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
@@ -229,7 +229,7 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-xls-loader</artifactId>
-            <version>${project.version}</version>
+            <version>${multibanking.version}</version>
             <scope>test</scope>
         </dependency>
 
