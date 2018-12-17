@@ -1,0 +1,5 @@
+docusafe:
+  storeconnection:
+    filesystem:
+      rootbucket: target/multibanking-filesystem
+      encryptionpassword: null
