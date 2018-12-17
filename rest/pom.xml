@@ -90,7 +90,7 @@
             <version>${mulitbanking.version}</version>
         </dependency>
         <dependency>
-            <groupId>de.adorsys.multibanking</groupId>
+            <groupId>de.adorsys.multibanking.docusafe</groupId>
             <artifactId>multibanking-mock-inmemory</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
