@@ -8,6 +8,10 @@ import de.adorsys.sts.resourceserver.persistence.InMemoryResourceServerRepositor
 import de.adorsys.sts.resourceserver.persistence.ResourceServerRepository;
 import de.adorsys.sts.resourceserver.service.UserDataRepository;
 import de.adorsys.sts.token.passwordgrant.EnablePasswordGrant;
+import org.adorsys.docusafe.business.DocumentSafeService;
+import org.adorsys.docusafe.business.impl.DocumentSafeServiceImpl;
+import org.adorsys.docusafe.business.impl.WithCache;
+import org.adorsys.docusafe.spring.factory.SpringExtendedStoreConnectionFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,7 +31,10 @@ public class PasswordGrantAuthServerConfig {
 	}
 
 	@Bean
-	UserDataRepository userDataRepository(ObjectMapper objectMapper, ExceptionHandlingDocumentSafeService documentSafeService) {
-		return new FsUserDataRepository(documentSafeService, objectMapper);
+	UserDataRepository userDataRepository(ObjectMapper objectMapper, SpringExtendedStoreConnectionFactory springExtendedStoreConnectionFactory) {
+		// Warning you can not use the client applications docusafe here.
+		DocumentSafeService documentSafeService = new DocumentSafeServiceImpl(WithCache.TRUE, springExtendedStoreConnectionFactory.getExtendedStoreConnectionWithSubDir("Test-Auth-Server-Only"));
+		ExceptionHandlingDocumentSafeService exceptionWrappedService  = new ExceptionHandlingDocumentSafeService(documentSafeService);
+		return new FsUserDataRepository(exceptionWrappedService, objectMapper);
 	}
 }

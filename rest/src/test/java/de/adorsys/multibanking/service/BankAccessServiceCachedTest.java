@@ -8,11 +8,13 @@ import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.adorsys.multibanking.service.interceptor.CacheInterceptor;
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("docusafe")
 public class BankAccessServiceCachedTest extends BankAccessServiceBlankTest {
 
 	@Autowired

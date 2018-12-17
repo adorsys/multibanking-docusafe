@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.adorsys.multibanking.utils.Ids;
@@ -12,6 +13,7 @@ import de.adorsys.multibanking.web.base.BaseControllerIT;
 import de.adorsys.multibanking.web.base.PasswordGrantResponse;
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("docusafe")
 public class PasswordGrantControllerTest extends BaseControllerIT {
 
     @Test

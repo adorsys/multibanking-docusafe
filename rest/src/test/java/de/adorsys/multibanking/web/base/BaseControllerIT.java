@@ -25,11 +25,12 @@ import java.net.URI;
 import java.util.Collections;
 
 @RunWith(SpringRunner.class)
-@ActiveProfiles({"InMemory", "IntegrationTest"})
+@ActiveProfiles({"InMemory", "IntegrationTest", "docusafe"})
+
 @SpringBootTest(properties = {Tp.p1, Tp.p2, Tp.p3, Tp.p4, Tp.p5, Tp.p6, Tp.p7, Tp.p8, Tp.p9, Tp.p10, Tp.p11, Tp.p12,
-Tp.p13, Tp.p14, Tp.p15, Tp.p16, Tp.p17, Tp.p18, Tp.p19, Tp.p20, Tp.p21, Tp.p22, Tp.p23,
-Tp.p24, Tp.p25, Tp.p26, Tp.p27, Tp.p28, Tp.p29, Tp.p30, Tp.p31, Tp.p32, Tp.p33, Tp.p34, Tp.p35, Tp.p36, Tp.p37, Tp.p38, Tp.p39, Tp.p40},
-webEnvironment = WebEnvironment.DEFINED_PORT)
+        Tp.p13, Tp.p14, Tp.p15, Tp.p16, Tp.p17, Tp.p18, Tp.p19, Tp.p20, Tp.p21, Tp.p22, Tp.p23,
+        Tp.p24, Tp.p25, Tp.p26, Tp.p27, Tp.p28, Tp.p29, Tp.p30, Tp.p31, Tp.p32, Tp.p33, Tp.p34, Tp.p35, Tp.p36, Tp.p37, Tp.p38, Tp.p39, Tp.p40},
+        webEnvironment = WebEnvironment.DEFINED_PORT)
 public abstract class BaseControllerIT {
     public final static Logger LOGGER = LoggerFactory.getLogger(BaseControllerIT.class);
 
@@ -64,22 +65,22 @@ public abstract class BaseControllerIT {
 
     protected PasswordGrantResponse auth(UserPasswordTuple userPasswordTuple) {
         URI uri = authPath()
-        .queryParam("grant_type", "password")
-        .queryParam("username", userPasswordTuple.getUser())
-        .queryParam("password", userPasswordTuple.getPassword())
-        .queryParam("audience", "multibanking")
-        .build().toUri();
+                .queryParam("grant_type", "password")
+                .queryParam("username", userPasswordTuple.getUser())
+                .queryParam("password", userPasswordTuple.getPassword())
+                .queryParam("audience", "multibanking")
+                .build().toUri();
 
         PasswordGrantResponse resp = testRestTemplate.getForObject(uri, PasswordGrantResponse.class);
 
         final String accessTokenValue = resp.getAccessToken();
 
         testRestTemplate.getRestTemplate().setInterceptors(
-        Collections.singletonList((request, body, execution) -> {
-            String authHeader = "Bearer " + accessTokenValue;
-            request.getHeaders().add("Authorization", authHeader);
-            return execution.execute(request, body);
-        }));
+                Collections.singletonList((request, body, execution) -> {
+                    String authHeader = "Bearer " + accessTokenValue;
+                    request.getHeaders().add("Authorization", authHeader);
+                    return execution.execute(request, body);
+                }));
 
         return resp;
     }

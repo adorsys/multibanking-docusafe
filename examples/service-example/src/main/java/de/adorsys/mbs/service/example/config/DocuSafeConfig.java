@@ -5,9 +5,11 @@ import javax.annotation.PostConstruct;
 import org.adorsys.cryptoutils.storeconnectionfactory.ExtendedStoreConnectionFactory;
 import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.impl.DocumentSafeServiceImpl;
+import org.adorsys.docusafe.business.impl.WithCache;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.adorsys.docusafe.spring.annotation.UseDocusafeSpringConfiguration;
+import org.adorsys.docusafe.spring.factory.SpringExtendedStoreConnectionFactory;
 import org.adorsys.encobject.domain.ReadKeyPassword;
 import org.adorsys.encobject.service.api.ExtendedStoreConnection;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +43,8 @@ public class DocuSafeConfig {
     }
 	
 	@Bean
-	DocumentSafeService docusafe(SystemContext systemContext, DocumentSafeService documentSafeService){
-		DocumentSafeService safe = new ExceptionHandlingDocumentSafeService(documentSafeService);
+	DocumentSafeService docusafe(SystemContext systemContext, SpringExtendedStoreConnectionFactory springExtendedStoreConnectionFactory){
+		DocumentSafeService safe = new ExceptionHandlingDocumentSafeService(new DocumentSafeServiceImpl(WithCache.TRUE, springExtendedStoreConnectionFactory.getExtendedStoreConnectionWithSubDir("docusafe-config")));
 		UserIDAuth systemId = systemContext.getUser().getAuth();
 		if(!safe.userExists(systemContext.getUser().getAuth().getUserID())){
 			safe.createUser(systemId);

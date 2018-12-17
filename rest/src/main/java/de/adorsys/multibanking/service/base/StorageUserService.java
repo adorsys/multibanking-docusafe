@@ -21,7 +21,7 @@ public class StorageUserService {
 	private final static Logger LOGGER = LoggerFactory.getLogger(StorageUserService.class);
 
 	@Autowired
-	private ExceptionHandlingDocumentSafeService documentSafeService;
+	private DocumentSafeService documentSafeService;
 
 	/**
 	 * Check existence of the user with the given user id.

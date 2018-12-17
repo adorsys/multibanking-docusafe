@@ -4,7 +4,9 @@ import de.adorsys.multibanking.service.base.ExceptionHandlingDocumentSafeService
 import org.adorsys.cryptoutils.storeconnectionfactory.ExtendedStoreConnectionFactory;
 import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.impl.DocumentSafeServiceImpl;
+import org.adorsys.docusafe.business.impl.WithCache;
 import org.adorsys.docusafe.spring.annotation.UseDocusafeSpringConfiguration;
+import org.adorsys.docusafe.spring.factory.SpringExtendedStoreConnectionFactory;
 import org.adorsys.encobject.service.api.ExtendedStoreConnection;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
 public class DocuSafeConfig {
 
 	@Bean
-	public ExceptionHandlingDocumentSafeService docusafe(DocumentSafeService documentSafeService){
-		return new ExceptionHandlingDocumentSafeService(documentSafeService);
+	public DocumentSafeService docusafe(SpringExtendedStoreConnectionFactory springExtendedStoreConnectionFactory){
+		return new ExceptionHandlingDocumentSafeService(new DocumentSafeServiceImpl(WithCache.TRUE, springExtendedStoreConnectionFactory.getExtendedStoreConnectionWithSubDir(null)));
 	}
 }

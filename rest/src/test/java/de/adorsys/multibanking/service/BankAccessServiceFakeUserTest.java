@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import de.adorsys.multibanking.config.service.BaseServiceTest;
@@ -27,6 +28,7 @@ import de.adorsys.onlinebanking.mock.MockBanking;
 import figo.FigoBanking;
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("docusafe")
 public class BankAccessServiceFakeUserTest extends BaseServiceTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(BankAccessServiceFakeUserTest.class);
 

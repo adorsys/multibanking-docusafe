@@ -7,6 +7,7 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -16,6 +17,7 @@ import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.utils.Ids;
 
 @RunWith(SpringRunner.class)
+@ActiveProfiles("docusafe")
 public class StorageUserServiceTest extends BaseServiceTest {
 
 	@Autowired

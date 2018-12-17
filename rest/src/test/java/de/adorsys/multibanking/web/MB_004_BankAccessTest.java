@@ -38,12 +38,13 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
 
     @Test
     public void test_1() {
-        createBankAccess(this, theBeckerTuple);
+        URI uri = createBankAccess(this, theBeckerTuple);
     }
 
     @Test
     public void test_2() {
         List<BankAccessID> bankAccessIDs = loadUserDataStructure(this, createBankAccess(this, theBeckerTuple)).getBankAccessIDs();
+        bankAccessIDs.forEach(id -> LOGGER.info("Bank ID Found:" + id));
         Assert.assertEquals(1, bankAccessIDs.size());
 
         URI deleteUri = bankAccessPath(this).pathSegment(bankAccessIDs.get(0).getValue()).build().toUri();
@@ -70,7 +71,7 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
     public void test_4() {
         int max = 5;
         URI location = null;
-        for (int i = 0; i<max; i++) {
+        for (int i = 0; i < max; i++) {
             location = createBankAccess(this, theBeckerTuple);
         }
 
@@ -80,36 +81,10 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
         Assert.assertEquals(max, uniqueSet.size());
 
         Assert.assertEquals(max, bankAccessIDs.size());
-        for (int i = 0; i<max; i++) {
+        for (int i = 0; i < max; i++) {
             URI deleteUri = bankAccessPath(this).pathSegment(bankAccessIDs.get(i).getValue()).build().toUri();
             setNextExpectedStatusCode(204);
             testRestTemplate.delete(deleteUri);
-        }
-    }
-
-    public static URI createBankAccess(MB_BaseTest base, BankAccessStructure bankAccessStructure) {
-        try {
-            URI uri = bankAccessPath(base).build().toUri();
-            base.setNextExpectedStatusCode(201);
-            URI location = base.testRestTemplate.postForLocation(uri, bankAccessStructure);
-            Assert.assertNotNull(location);
-            return location;
-        } catch (Exception e) {
-            throw BaseExceptionHandler.handle(e);
-        }
-    }
-
-    public static UserDataStructure loadUserDataStructure(MB_BaseTest base, URI location) {
-        try {
-            base.setNextExpectedStatusCode(200);
-            String userData = base.testRestTemplate.getForObject(location, String.class);
-            Assert.assertNotNull(userData);
-            JSONObject j = new JSONObject(userData);
-            UserDataStructure userDataStructure = new UserDataStructure(j);
-            LOGGER.debug(userDataStructure.toString());
-            return userDataStructure;
-        } catch (Exception e) {
-            throw BaseExceptionHandler.handle(e);
         }
     }
 
@@ -118,10 +93,10 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
         UserDataStructure userDataStructure = loadUserDataStructure(this, MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple));
         Assert.assertNotNull(userDataStructure);
     }
-    
+
     @Test
     public void forbiden_on_create_bank_access_wrong_pin() {
-    	BankAccessStructure bankLogin = new BankAccessStructure("19999999", "m.becker", WRONG_PIN);
+        BankAccessStructure bankLogin = new BankAccessStructure("19999999", "m.becker", WRONG_PIN);
         BankAccessEntity be = new BankAccessEntity();
         be.setBankCode(bankLogin.getBankCode());
         be.setBankLogin(bankLogin.getBankLogin());
@@ -157,6 +132,32 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
                 Assert.assertFalse(userDataStructure.getLastSync(bankAccessID, bankAccountID).isPresent());
             });
         });
+    }
+
+    public static URI createBankAccess(MB_BaseTest base, BankAccessStructure bankAccessStructure) {
+        try {
+            URI uri = bankAccessPath(base).build().toUri();
+            base.setNextExpectedStatusCode(201);
+            URI location = base.testRestTemplate.postForLocation(uri, bankAccessStructure);
+            Assert.assertNotNull(location);
+            return location;
+        } catch (Exception e) {
+            throw BaseExceptionHandler.handle(e);
+        }
+    }
+
+    public static UserDataStructure loadUserDataStructure(MB_BaseTest base, URI location) {
+        try {
+            base.setNextExpectedStatusCode(200);
+            String userData = base.testRestTemplate.getForObject(location, String.class);
+            Assert.assertNotNull(userData);
+            JSONObject j = new JSONObject(userData);
+            UserDataStructure userDataStructure = new UserDataStructure(j);
+            LOGGER.debug(userDataStructure.toString());
+            return userDataStructure;
+        } catch (Exception e) {
+            throw BaseExceptionHandler.handle(e);
+        }
     }
 
 
