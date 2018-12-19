@@ -21,7 +21,7 @@ import java.util.*;
 
 @Service
 public class BankAccountService {
-    private static final Logger log = LoggerFactory.getLogger(BankAccessService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BankAccessService.class);
 
     @Autowired
     private UserDataService uds;
@@ -51,7 +51,7 @@ public class BankAccountService {
             accountData.get().setBankAccount(account);
         });
         uds.store(userData);
-        log.info("[{}] accounts for connection [{}] created.", bankAccounts.size(), bankAccess.getId());
+        LOGGER.info("[{}] accounts for connection [{}] created.", bankAccounts.size(), bankAccess.getId());
     }
 
     public List<BankAccountEntity> loadFromBankingAPI(BankAccessEntity bankAccess, BankAccessCredentials credentials, BankApi bankApi) {
@@ -92,7 +92,22 @@ public class BankAccountService {
 
         bankAccounts.forEach(source -> {
             BankAccountEntity target = new BankAccountEntity();
+
             target.id(source.getIban());
+            String idToBeUsed = source.getIban();
+            if (idToBeUsed == null) {
+                idToBeUsed = source.getAccountNumber();
+                if (idToBeUsed == null) {
+                    idToBeUsed = UUID.randomUUID().toString();
+                    LOGGER.debug("BankAccount id is uuid, rather than iban or account number: " + idToBeUsed);
+                } else {
+                    LOGGER.debug("BankAccount id is account number, rather than iban: " + idToBeUsed);
+                }
+            } else {
+                LOGGER.debug("BankAccount id is iban: " + idToBeUsed);
+            }
+            target.id(idToBeUsed);
+
             BeanUtils.copyProperties(source, target);
             target.setUserId(bankAccess.getUserId());
             bankAccountEntities.add(target);

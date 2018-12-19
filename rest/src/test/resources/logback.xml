@@ -19,6 +19,7 @@
         </encoder>
     </appender>
 
+    <Logger name="de.adorsys.multibanking.service" level="debug"/>
     <logger name="org.adorsys" level="info"/>
     <logger name="de.adorsys" level="info"/>
     <logger name="domain" level="info"/>
